@@ -1,10 +1,12 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 import sys
 import random
 import signal
 import time
 import copy
+
+from team36 import Team36
 
 TIME = 16
 MAX_PTS = 68
@@ -13,7 +15,7 @@ class TimedOutExc(Exception):
 	pass
 
 def handler(signum, frame):
-	#print 'Signal handler called with signal', signum
+	#print('Signal handler called with signal', signum)
 	raise TimedOutExc()
 
 class Random_Player():
@@ -26,14 +28,8 @@ class Random_Player():
 		cells = board.find_valid_move_cells(old_move)
 		return cells[random.randrange(len(cells))]
 
-class Manual_Player:
-	def __init__(self):
-		pass
-	def move(self, board, old_move, flag):
-		print 'Enter your move: <format:row column> (you\'re playing with', flag + ")"
-		mvp = raw_input()
-		mvp = mvp.split()
-		return (int(mvp[0]), int(mvp[1]))
+class Manual_Player(Team36):
+	pass
 
 class Board:
 
@@ -45,23 +41,23 @@ class Board:
 
 	def print_board(self):
 		# for printing the state of the board
-		print '==============Board State=============='
+		print('==============Board State==============')
 		for i in range(16):
 			if i%4 == 0:
 				print
 			for j in range(16):
 				if j%4 == 0:
-					print "",
-				print self.board_status[i][j],
+					print("",)
+				print(self.board_status[i][j],)
 			print
 		print
 
-		print '==============Block State=============='
+		print('==============Block State==============')
 		for i in range(4):
 			for j in range(4):
-				print self.block_status[i][j],
+				print(self.block_status[i][j],)
 			print
-		print '======================================='
+		print('=======================================')
 		print
 		print
 
@@ -80,7 +76,7 @@ class Board:
 		else:
 			for i in range(16):
 				for j in range(16):
-					if self.board_status[i][j] == '-' and self.block_status[i/4][j/4] == '-':
+					if self.board_status[i][j] == '-' and self.block_status[int(i/4)][int(j/4)] == '-':
 						allowed_cells.append((i,j))
 		return allowed_cells
 
@@ -104,7 +100,7 @@ class Board:
 		for i in range(4):
 			row = bs[i]							#i'th row
 			col = [x[i] for x in bs]			#i'th column
-			#print row,col
+			#print(row,col)
 			#checking if i'th row or i'th column has been won or not
 			if (row[0] =='x' or row[0] == 'o') and (row.count(row[0]) == 4):
 				return (row[0],'WON')
@@ -151,25 +147,25 @@ class Board:
 		#checking if a block has been won or drawn or not after the current move
 		for i in range(4):
 			#checking for horizontal pattern(i'th row)
-			if (bs[4*x+i][4*y] == bs[4*x+i][4*y+1] == bs[4*x+i][4*y+2] == bs[4*x+i][4*y+3]) and (bs[4*x+i][4*y] == ply):
+			if (bs[int(4*x+i)][int(4*y)]== bs[int(4*x+i)][int(4*y+1)] == bs[int(4*x+i)][int(4*y+2)] == bs[int(4*x+i)][int(4*y+3)]) and (bs[int(4*x+i)][int(4*y)]== ply):
 				self.block_status[x][y] = ply
 				return 'SUCCESSFUL', True
 			#checking for vertical pattern(i'th column)
-			if (bs[4*x][4*y+i] == bs[4*x+1][4*y+i] == bs[4*x+2][4*y+i] == bs[4*x+3][4*y+i]) and (bs[4*x][4*y+i] == ply):
+			if (bs[int(4*x)][4*int(y+i)] == bs[int(4*x+1)][int(4*y+i)] == bs[int(4*x+2)][int(4*y+i)] == bs[int(4*x+3)][int(4*y+i)]) and (bs[int(4*x)][4*int(y+i)]== ply:
 				self.block_status[x][y] = ply
 				return 'SUCCESSFUL', True
 
 		#checking for diamond pattern
 		#diamond 1
-		if (bs[4*x+1][4*y] == bs[4*x][4*y+1] == bs[4*x+2][4*y+1] == bs[4*x+1][4*y+2]) and (bs[4*x+1][4*y] == ply):
+		if (bs[int(4*x+1)][int(4*y] )== bs[int(4*x][)4*int(y+1] )== bs[int(4*x+2)][int(4*y+1)] == bs[int(4*x+1)][int(4*y+2)]) and (bs[int(4*x+1)][int(4*y] )== ply):
 			self.block_status[x][y] = ply
 			return 'SUCCESSFUL', True
 		#diamond 2
-		if (bs[4*x+1][4*y+1] == bs[4*x][4*y+2] == bs[4*x+2][4*y+2] == bs[4*x+1][4*y+3]) and (bs[4*x+1][4*y+1] == ply):
+		if (bs[int(4*x+1)][int(4*y+1)] == bs[int(4*x][)4*int(y+2] )== bs[int(4*x+2)][int(4*y+2)] == bs[int(4*x+1)][int(4*y+3)]) and (bs[int(4*x+1)][int(4*y+1)] == ply):
 			self.block_status[x][y] = ply
 			return 'SUCCESSFUL', True
 		#diamond 3
-		if (bs[4*x+2][4*y] == bs[4*x+1][4*y+1] == bs[4*x+3][4*y+1] == bs[4*x+2][4*y+2]) and (bs[4*x+2][4*y] == ply):
+		if (bs[int(4*x+2)][int(4*y] )== bs[int(4*x+1)][int(4*y+1)] == bs[int(4*x+3)][int(4*y+1)] == bs[int(4*x+2)][int(4*y+2)]) and (bs[int(4*x+2)][int(4*y] )== ply):
 			self.block_status[x][y] = ply
 			return 'SUCCESSFUL', True
 		#diamond 4
@@ -197,7 +193,7 @@ def player_turn(game_board, old_move, obj, ply, opp, flg):
 		try:									#try to get player 1's move
 			p_move = obj.move(game_board, old_move, flg)
 		except TimedOutExc:					#timeout error
-#			print e
+#			print(e)
 			WINNER = opp
 			MESSAGE = 'TIME OUT'
 			pts[opp] = MAX_PTS
@@ -224,7 +220,7 @@ def player_turn(game_board, old_move, obj, ply, opp, flg):
 			return p_move, WINNER, MESSAGE, pts["P1"], pts["P2"], True, False
 
 		status = game_board.find_terminal_state()		#find if the game has ended and if yes, find the winner
-		print status
+		print(status)
 		if status[1] == 'WON':							#if the game has ended after a player1 move, player 1 would win
 			pts[ply] = MAX_PTS
 			WINNER = ply
@@ -289,8 +285,8 @@ def gameplay(obj1, obj2):				#game simulator
 
 	game_board.print_board()
 
-	print "Winner:", WINNER
-	print "Message", MESSAGE
+	print("Winner:", WINNER)
+	print("Message", MESSAGE)
 
 	x = 0
 	d = 0
@@ -303,7 +299,7 @@ def gameplay(obj1, obj2):				#game simulator
 				o += 1
 			if game_board.block_status[i][j] == 'd':
 				d += 1
-	print 'x:', x, ' o:',o,' d:',d
+	print('x:', x, ' o:',o,' d:',d)
 	if MESSAGE == 'DRAW':
 
 		for i in range(4):
@@ -344,10 +340,10 @@ def is_corner(row, col):
 if __name__ == '__main__':
 
 	if len(sys.argv) != 2:
-		print 'Usage: python simulator.py <option>'
-		print '<option> can be 1 => Random player vs. Random player'
-		print '                2 => Human vs. Random Player'
-		print '                3 => Human vs. Human'
+		print('Usage: python simulator.py <option>')
+		print('<option> can be 1 => Random player vs. Random player')
+		print('                2 => Human vs. Random Player')
+		print('                3 => Human vs. Human')
 		sys.exit(1)
 
 	obj1 = ''
@@ -364,9 +360,9 @@ if __name__ == '__main__':
 		obj1 = Manual_Player()
 		obj2 = Manual_Player()
 	else:
-		print 'Invalid option'
+		print('Invalid option')
 		sys.exit(1)
 
 	x = gameplay(obj1, obj2)
-	print "Player 1 points:", x[0]
-	print "Player 2 points:", x[1]
+	print("Player 1 points:", x[0])
+	print("Player 2 points:", x[1])
