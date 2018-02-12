@@ -76,7 +76,7 @@ class Board:
 		else:
 			for i in range(16):
 				for j in range(16):
-					if self.board_status[i][j] == '-' and self.block_status[int(i/4)][int(j/4)] == '-':
+					if self.board_status[i][j] == '-' and self.block_status[i/4][j/4] == '-':
 						allowed_cells.append((i,j))
 		return allowed_cells
 
@@ -147,25 +147,25 @@ class Board:
 		#checking if a block has been won or drawn or not after the current move
 		for i in range(4):
 			#checking for horizontal pattern(i'th row)
-			if (bs[int(4*x+i)][int(4*y)]== bs[int(4*x+i)][int(4*y+1)] == bs[int(4*x+i)][int(4*y+2)] == bs[int(4*x+i)][int(4*y+3)]) and (bs[int(4*x+i)][int(4*y)]== ply):
+			if (bs[4*x+i][4*y] == bs[4*x+i][4*y+1] == bs[4*x+i][4*y+2] == bs[4*x+i][4*y+3]) and (bs[4*x+i][4*y] == ply):
 				self.block_status[x][y] = ply
 				return 'SUCCESSFUL', True
 			#checking for vertical pattern(i'th column)
-			if (bs[int(4*x)][4*int(y+i)] == bs[int(4*x+1)][int(4*y+i)] == bs[int(4*x+2)][int(4*y+i)] == bs[int(4*x+3)][int(4*y+i)]) and (bs[int(4*x)][4*int(y+i)]== ply:
+			if (bs[4*x][4*y+i] == bs[4*x+1][4*y+i] == bs[4*x+2][4*y+i] == bs[4*x+3][4*y+i]) and (bs[4*x][4*y+i] == ply):
 				self.block_status[x][y] = ply
 				return 'SUCCESSFUL', True
 
 		#checking for diamond pattern
 		#diamond 1
-		if (bs[int(4*x+1)][int(4*y] )== bs[int(4*x][)4*int(y+1] )== bs[int(4*x+2)][int(4*y+1)] == bs[int(4*x+1)][int(4*y+2)]) and (bs[int(4*x+1)][int(4*y] )== ply):
+		if (bs[4*x+1][4*y] == bs[4*x][4*y+1] == bs[4*x+2][4*y+1] == bs[4*x+1][4*y+2]) and (bs[4*x+1][4*y] == ply):
 			self.block_status[x][y] = ply
 			return 'SUCCESSFUL', True
 		#diamond 2
-		if (bs[int(4*x+1)][int(4*y+1)] == bs[int(4*x][)4*int(y+2] )== bs[int(4*x+2)][int(4*y+2)] == bs[int(4*x+1)][int(4*y+3)]) and (bs[int(4*x+1)][int(4*y+1)] == ply):
+		if (bs[4*x+1][4*y+1] == bs[4*x][4*y+2] == bs[4*x+2][4*y+2] == bs[4*x+1][4*y+3]) and (bs[4*x+1][4*y+1] == ply):
 			self.block_status[x][y] = ply
 			return 'SUCCESSFUL', True
 		#diamond 3
-		if (bs[int(4*x+2)][int(4*y] )== bs[int(4*x+1)][int(4*y+1)] == bs[int(4*x+3)][int(4*y+1)] == bs[int(4*x+2)][int(4*y+2)]) and (bs[int(4*x+2)][int(4*y] )== ply):
+		if (bs[4*x+2][4*y] == bs[4*x+1][4*y+1] == bs[4*x+3][4*y+1] == bs[4*x+2][4*y+2]) and (bs[4*x+2][4*y] == ply):
 			self.block_status[x][y] = ply
 			return 'SUCCESSFUL', True
 		#diamond 4
