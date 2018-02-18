@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python2
 
 import sys
 import random
@@ -47,15 +47,15 @@ class Board:
 				print
 			for j in range(16):
 				if j%4 == 0:
-					print("",)
-				print(self.board_status[i][j],)
+					print "",
+				print self.board_status[i][j],
 			print
 		print
 
 		print('==============Block State==============')
 		for i in range(4):
 			for j in range(4):
-				print(self.block_status[i][j],)
+				print self.block_status[i][j],
 			print
 		print('=======================================')
 		print
