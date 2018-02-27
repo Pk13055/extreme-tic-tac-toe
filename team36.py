@@ -12,6 +12,7 @@ from __future__ import print_function
 import datetime
 import json
 from random import choice, random, randint
+from time import sleep
 
 import numpy as np
 import pandas as pd
@@ -23,6 +24,9 @@ O = 0
 
 MAX_REWARD = 100
 MIN_REWARD = -100
+
+printJ = lambda x: print(json.dumps(x, indent=4))
+
 
 class Team36:
 
@@ -49,31 +53,40 @@ class Team36:
 			@return tuple (row, col)
 
 		'''
+		# if old_move == (-1, -1):
+		# 	print("First Player")
+		# 	first_moves = [ (5, 5), (5, 10), (10, 5), (10, 10) ]
+		# 	return choice(first_moves)
+
+		print("Old Move", old_move)
+		if board.board_status[old_move[0]][old_move[1]] == 'x':
+			self.player = O
+		else:
+			self.player = X
 
 		self.board_state = np.array([[EMPTY if _ == '-' else X if _ == 'x' else O for _ in r]
 		 for r in board.board_status])
 		self.block_state = np.array([[X if _ == 'x' else O if _ == 'o' else EMPTY if _ == '-' else DRAW for _ in r]
 		 for r in board.block_status])
-		init_moves = board.valid_moves(old_move, self.block_state, self.board_state)
-		if not self.player:
-			if self.board_state[old_move] == X:
-				self.player = O
-			else:
-				self.player = X
+		init_moves = self.valid_moves(old_move, self.block_state, self.board_state)
+		print(init_moves)
+		best_move = choice(init_moves)
+		print("Returning", best_move, self.player)
+		sleep(2)
 
-		# add learning and AI part here
-		best_move, best_score = (-1, -1), MIN_REWARD
-		for cur_move in init_moves:
-			score = minimax(self.board_state, self.blocksck_state, old_move,
-				cur_move, 0, self.player, self.player)
-			if score >= best_score:
-				best_score = score
-				best_move = cur_move
+		# # add learning and AI part here
+		# best_move, best_score = (-1, -1), MIN_REWARD
+
+		# # for cur_move in init_moves:
+		# # 	score = minimax(self.board_state, self.blocksck_state, old_move,
+		# # 		cur_move, 0, self.player, self.player)
+		# # 	if score >= best_score:
+		# # 		best_score = score
+		# # 		best_move = cur_move
 
 		# if not valid, find row col here
-		row, col = best_move
 		# returns a tuple with x row and y col (16 x 16)
-		return (row, col)
+		return best_move
 
 	def minimax(self, board_state, block_state, old_move, new_move, cur_depth,
 		current_player, maximizing_player, max_depth=6):
@@ -133,9 +146,9 @@ class Team36:
 
 		o_r, o_c = old_move
 		a_r, a_c = (o_r % 4, o_c % 4)
-		if old_move != (-1, -1) and block_state[a_r, a_c] == EMPTY:
+		if block_state[a_r, a_c] == EMPTY and old_move != (-1, -1) :
 			r, c = np.where(board_state[4 * a_r: 4 * a_r + 4, 4 * a_c: 4 * a_c + 4] == EMPTY)
-			return [(_r, _c) for _r, _c in zip(r, c)]
+			return [(_r, _c) for _r, _c in zip(r + 4 * a_r, c + 4 * a_c)]
 		else:
 			r, c = np.where(board_state == EMPTY)
 			return [(_r, _c) for _r, _c, in zip(r, c) if block_state[_r / 4, _c / 4] == EMPTY]

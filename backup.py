@@ -5,9 +5,8 @@ import random
 import signal
 import time
 import copy
-import traceback
-from team36_final import Team36 as t2
-from base_final import Team36 as t3
+
+from team36 import Team36
 
 TIME = 16
 MAX_PTS = 68
@@ -16,7 +15,7 @@ class TimedOutExc(Exception):
 	pass
 
 def handler(signum, frame):
-	#print 'Signal handler called with signal', signum
+	#print('Signal handler called with signal', signum)
 	raise TimedOutExc()
 
 class Random_Player():
@@ -29,14 +28,7 @@ class Random_Player():
 		cells = board.find_valid_move_cells(old_move)
 		return cells[random.randrange(len(cells))]
 
-class Manual_Player(t2):
-	# def __init__(self):
-	# 	pass
-	# def move(self, board, old_move, flag):
-	# 	print 'Enter your move: <format:row column> (you\'re playing with', flag + ")"
-	# 	mvp = raw_input()
-	# 	mvp = mvp.split()
-	# 	return (int(mvp[0]), int(mvp[1]))
+class Manual_Player(Team36):
 	pass
 
 class Board:
@@ -49,7 +41,7 @@ class Board:
 
 	def print_board(self):
 		# for printing the state of the board
-		print '==============Board State=============='
+		print('==============Board State==============')
 		for i in range(16):
 			if i%4 == 0:
 				print
@@ -60,12 +52,12 @@ class Board:
 			print
 		print
 
-		print '==============Block State=============='
+		print('==============Block State==============')
 		for i in range(4):
 			for j in range(4):
 				print self.block_status[i][j],
 			print
-		print '======================================='
+		print('=======================================')
 		print
 		print
 
@@ -108,7 +100,7 @@ class Board:
 		for i in range(4):
 			row = bs[i]							#i'th row
 			col = [x[i] for x in bs]			#i'th column
-			#print row,col
+			#print(row,col)
 			#checking if i'th row or i'th column has been won or not
 			if (row[0] =='x' or row[0] == 'o') and (row.count(row[0]) == 4):
 				return (row[0],'WON')
@@ -117,13 +109,13 @@ class Board:
 
 		#checking if diamond has been won
 		if(bs[1][0] == bs[0][1] == bs[2][1] == bs[1][2]) and (bs[1][0] == 'x' or bs[1][0] == 'o'):
-			return (bs[1][0],'WON')
+			return (bs[0][0],'WON')
 		if(bs[1][1] == bs[0][2] == bs[2][2] == bs[1][3]) and (bs[1][1] == 'x' or bs[1][1] == 'o'):
-			return (bs[1][1],'WON')
+			return (bs[0][0],'WON')
 		if(bs[2][0] == bs[1][1] == bs[3][1] == bs[2][2]) and (bs[2][0] == 'x' or bs[2][0] == 'o'):
-			return (bs[2][0],'WON')
+			return (bs[0][0],'WON')
 		if(bs[2][1] == bs[1][2] == bs[3][2] == bs[2][3]) and (bs[2][1] == 'x' or bs[2][1] == 'o'):
-			return (bs[2][1],'WON')
+			return (bs[0][0],'WON')
 
 		if cntx+cnto+cntd <16:		#if all blocks have not yet been won, continue
 			return ('CONTINUE', '-')
@@ -197,20 +189,18 @@ def player_turn(game_board, old_move, obj, ply, opp, flg):
 		MESSAGE = ''
 		pts = {"P1" : 0, "P2" : 0}
 		to_break = False
-		p_move = ''
 
 		try:									#try to get player 1's move
 			p_move = obj.move(game_board, old_move, flg)
 		except TimedOutExc:					#timeout error
-#			print e
+#			print(e)
 			WINNER = opp
 			MESSAGE = 'TIME OUT'
 			pts[opp] = MAX_PTS
 			return p_move, WINNER, MESSAGE, pts["P1"], pts["P2"], True, False
 		except Exception as e:
 			WINNER = opp
-			MESSAGE = "THREW AN EXCEPTION"
-			traceback.print_exc()
+			MESSAGE = 'INVALID MOVE'
 			pts[opp] = MAX_PTS
 			return p_move, WINNER, MESSAGE, pts["P1"], pts["P2"], True, False
 		signal.alarm(0)
@@ -230,7 +220,7 @@ def player_turn(game_board, old_move, obj, ply, opp, flg):
 			return p_move, WINNER, MESSAGE, pts["P1"], pts["P2"], True, False
 
 		status = game_board.find_terminal_state()		#find if the game has ended and if yes, find the winner
-		print status
+		print(status)
 		if status[1] == 'WON':							#if the game has ended after a player1 move, player 1 would win
 			pts[ply] = MAX_PTS
 			WINNER = ply
@@ -295,8 +285,8 @@ def gameplay(obj1, obj2):				#game simulator
 
 	game_board.print_board()
 
-	print "Winner:", WINNER
-	print "Message", MESSAGE
+	print("Winner:", WINNER)
+	print("Message", MESSAGE)
 
 	x = 0
 	d = 0
@@ -309,7 +299,7 @@ def gameplay(obj1, obj2):				#game simulator
 				o += 1
 			if game_board.block_status[i][j] == 'd':
 				d += 1
-	print 'x:', x, ' o:',o,' d:',d
+	print('x:', x, ' o:',o,' d:',d)
 	if MESSAGE == 'DRAW':
 
 		for i in range(4):
@@ -350,10 +340,10 @@ def is_corner(row, col):
 if __name__ == '__main__':
 
 	if len(sys.argv) != 2:
-		print 'Usage: python simulator.py <option>'
-		print '<option> can be 1 => Random player vs. Random player'
-		print '                2 => Human vs. Random Player'
-		print '                3 => Human vs. Human'
+		print('Usage: python simulator.py <option>')
+		print('<option> can be 1 => Random player vs. Random player')
+		print('                2 => Human vs. Random Player')
+		print('                3 => Human vs. Human')
 		sys.exit(1)
 
 	obj1 = ''
@@ -364,15 +354,15 @@ if __name__ == '__main__':
 		obj2 = Random_Player()
 
 	elif option == '2':
-		obj1 = t3()
-		obj2 = t3()
-	elif option == '3':
 		obj1 = Random_Player()
-		obj2 = t3()
+		obj2 = Manual_Player()
+	elif option == '3':
+		obj1 = Manual_Player()
+		obj2 = Manual_Player()
 	else:
-		print 'Invalid option'
+		print('Invalid option')
 		sys.exit(1)
 
 	x = gameplay(obj1, obj2)
-	print "Player 1 points:", x[0]
-	print "Player 2 points:", x[1]
+	print("Player 1 points:", x[0])
+	print("Player 2 points:", x[1])
